@@ -1,27 +1,21 @@
 import { Observable } from "rxjs";
 
-const observable$ = new Observable<string>((subscriber) => {
-  console.log("Observable Executed");
-  subscriber.next("Alice");
-  subscriber.next("Ben");
+const interval$ = new Observable<number>((subscriber) => {
+  let counter = 1;
 
-  setTimeout(() => {
-    subscriber.error(new Error("Failure"));
+  const intervalId = setInterval(() => {
+    console.log("Emitted", counter);
+    subscriber.next(counter++);
   }, 2000);
 
-  setTimeout(() => {
-    subscriber.next("Charlie");
-    subscriber.complete();
-  }, 4000);
-
   return () => {
-    console.log("Teardown");
+    clearInterval(intervalId);
   };
 });
 
-console.log("Before subscribe");
-observable$.subscribe({
-  next: (value) => console.log(value),
-  error: (err) => console.log(err.message),
-  complete: () => console.log("Completed"),
-});
+const subscription = interval$.subscribe((value) => console.log(value));
+
+setTimeout(() => {
+  console.log("Unsubscribe");
+  subscription.unsubscribe();
+}, 7000);
