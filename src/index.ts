@@ -1,19 +1,27 @@
-import { Observable } from "rxjs";
+import { Observable, of } from "rxjs";
 
-const helloButton = document.querySelector("button#hello");
-
-const helloClick$ = new Observable<MouseEvent>((subscriber) => {
-  helloButton.addEventListener("click", (event: MouseEvent) => {
-    subscriber.next(event);
-  });
+ourOwnOf("Alice", "Ben", "Charlie").subscribe({
+  next: (value) => console.log(value),
+  complete: () => console.log("Completed"),
 });
 
-helloClick$.subscribe((event) =>
-  console.log("Sub 1: ", event.type, event.x, event.y)
-);
+// const names$ = new Observable<string>((subscriber) => {
+//   subscriber.next("Alice");
+//   subscriber.next("Charlie");
+//   subscriber.next("Ben");
+//   subscriber.complete();
+// });
 
-setTimeout(() => {
-  helloClick$.subscribe((event) =>
-    console.log("Sub 2: ", event.type, event.x, event.y)
-  );
-}, 5000);
+// names$.subscribe({
+//   next: (value) => console.log(value),
+//   complete: () => console.log("Completed"),
+// });
+
+function ourOwnOf(...args: string[]): Observable<string> {
+  return new Observable<string>((subscriber) => {
+    args.forEach((arg) => {
+      subscriber.next(arg);
+    });
+    subscriber.complete();
+  });
+}
